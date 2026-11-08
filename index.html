@@ -4,155 +4,110 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Alca Canva — Studio Desain</title>
-<meta name="description" content="Web design editor. Credits: AlcaW44">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap">
-<link rel="stylesheet" href="src/css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<!-- TOP BAR -->
 <header class="topbar">
-  <div class="topbar-left">
+  <div class="top-left">
     <a class="brand" href="#" onclick="return false">Alca<em>.</em>Canva</a>
     <span class="tag" id="docSize">1080 × 1080</span>
   </div>
-  <div class="topbar-center">
-    <button class="tb-btn" id="undoBtn" title="Undo (Ctrl+Z)">↶</button>
-    <button class="tb-btn" id="redoBtn" title="Redo (Ctrl+Y)">↷</button>
-    <span class="divider"></span>
-    <button class="tb-btn" id="zoomOut" title="Zoom Out">−</button>
+  <div class="top-center">
+    <button class="tb-btn" id="undoBtn" onclick="undo()" title="Undo (Ctrl+Z)">↶</button>
+    <button class="tb-btn" id="redoBtn" onclick="redo()" title="Redo (Ctrl+Y)">↷</button>
+    <button class="tb-btn" onclick="zoomOut()">−</button>
     <span class="zoom-val" id="zoomVal">100%</span>
-    <button class="tb-btn" id="zoomIn" title="Zoom In">+</button>
-    <button class="tb-btn" id="zoomFit" title="Fit">⤢</button>
+    <button class="tb-btn" onclick="zoomIn()">+</button>
+    <button class="tb-btn" onclick="zoomFit()">⤢</button>
   </div>
-  <div class="topbar-right">
-    <button class="btn-ghost" id="newBtn">+ Baru</button>
-    <button class="btn-primary" id="exportBtn">⬇ Export</button>
+  <div class="top-right">
+    <button class="btn-ghost" onclick="newDesign()">+ Baru</button>
+    <button class="btn-primary" onclick="openExport()">⬇ Export</button>
   </div>
 </header>
 
-<!-- WORKSPACE -->
 <main class="workspace">
-  <!-- LEFT SIDEBAR -->
-  <aside class="sidebar left-sidebar">
+  <!-- PANEL KIRI -->
+  <aside class="sidebar left">
     <div class="side-tabs">
-      <button class="side-tab active" data-tab="templates" title="Ukuran Kanvas">📐 Ukuran</button>
-      <button class="side-tab" data-tab="elements" title="Elemen">✦ Elemen</button>
-      <button class="side-tab" data-tab="text" title="Teks">T Teks</button>
-      <button class="side-tab" data-tab="uploads" title="Gambar">🖼 Gambar</button>
-      <button class="side-tab" data-tab="background" title="Warna">🎨 Warna</button>
+      <button class="side-tab active" onclick="switchTab('templates', this)">📐 Ukuran</button>
+      <button class="side-tab" onclick="switchTab('elements', this)">✦ Elemen</button>
+      <button class="side-tab" onclick="switchTab('text', this)">T Teks</button>
+      <button class="side-tab" onclick="switchTab('uploads', this)">🖼 Gambar</button>
     </div>
-
-    <!-- Panel: Templates -->
-    <div class="side-panel active" data-panel="templates">
+    
+    <div class="side-panel active" id="panel-templates">
       <h3 class="panel-h">Ukuran Kanvas</h3>
       <div class="preset-grid" id="presetGrid"></div>
-      <h3 class="panel-h">Warna Dasar</h3>
-      <div class="preset-grid" id="bgPresetGrid"></div>
     </div>
-
-    <!-- Panel: Elements -->
-    <div class="side-panel" data-panel="elements">
+    
+    <div class="side-panel" id="panel-elements">
       <h3 class="panel-h">Shapes</h3>
       <div class="shape-grid" id="shapeGrid"></div>
       <h3 class="panel-h">Icons</h3>
       <div class="shape-grid" id="iconGrid"></div>
     </div>
-
-    <!-- Panel: Text -->
-    <div class="side-panel" data-panel="text">
+    
+    <div class="side-panel" id="panel-text">
       <h3 class="panel-h">Tambah Teks</h3>
-      <button class="block-btn big" data-add="heading">+ Heading</button>
-      <button class="block-btn" data-add="subtext">+ Subheading</button>
-      <button class="block-btn" data-add="body">+ Body Text</button>
-      <h3 class="panel-h">Font Populer</h3>
-      <div id="fontPresets"></div>
+      <button class="block-btn big" onclick="addText('heading')">+ Heading</button>
+      <button class="block-btn" onclick="addText('subtext')">+ Subheading</button>
+      <button class="block-btn" onclick="addText('body')">+ Body Text</button>
     </div>
-
-    <!-- Panel: Uploads -->
-    <div class="side-panel" data-panel="uploads">
+    
+    <div class="side-panel" id="panel-uploads">
       <h3 class="panel-h">Upload Gambar</h3>
-      <div class="drop-zone" id="dropZone">
-        <input type="file" id="uploadInput" accept="image/*" multiple>
+      <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*" onchange="handleUpload(event)">
         <div class="drop-icon">🖼</div>
-        <div class="drop-txt">Klik / seret gambar ke sini</div>
+        <div class="drop-txt">Klik untuk upload</div>
       </div>
-      <div class="uploads-list" id="uploadsList"></div>
-    </div>
-
-    <!-- Panel: Background -->
-    <div class="side-panel" data-panel="background">
-      <h3 class="panel-h">Warna Solid</h3>
-      <div class="color-swatches" id="solidSwatches"></div>
-      <div class="row" style="display:flex;gap:6px;margin-top:8px">
-        <input type="color" id="bgColorPicker" value="#0a0a0a">
-        <input type="text" id="bgColorHex" value="#0a0a0a" maxlength="7">
-      </div>
-      <h3 class="panel-h">Gradient</h3>
-      <div class="gradient-presets" id="gradientPresets"></div>
     </div>
   </aside>
 
-  <!-- CENTER: Canvas -->
-  <section class="canvas-area" id="canvasArea">
+  <!-- AREA CANVAS -->
+  <section class="canvas-area" id="canvasArea" onmousedown="startDrag(event)" ontouchstart="startDrag(event)">
     <div class="canvas-stage" id="canvasStage">
       <canvas id="mainCanvas"></canvas>
     </div>
   </section>
 
-  <!-- RIGHT SIDEBAR -->
-  <aside class="sidebar right-sidebar">
+  <!-- PANEL KANAN -->
+  <aside class="sidebar right">
     <div class="side-tabs">
-      <button class="side-tab active" data-rtab="props">⚙ Properti</button>
-      <button class="side-tab" data-rtab="layers">▤ Layer</button>
+      <button class="side-tab active" onclick="switchRTab('props', this)">⚙ Properti</button>
+      <button class="side-tab" onclick="switchRTab('layers', this)">▤ Layer</button>
     </div>
-
-    <!-- Panel: Properties -->
-    <div class="side-panel active" data-rpanel="props">
-      <div id="propsEmpty" class="empty-props">
-        <div style="font-size:32px;opacity:.3;margin-bottom:10px">⚙</div>
-        <div>Pilih elemen untuk edit</div>
-      </div>
+    <div class="side-panel active" id="panel-props">
+      <div id="propsEmpty" class="empty-props">Pilih elemen untuk edit</div>
       <div id="propsContent" hidden></div>
     </div>
-
-    <!-- Panel: Layers -->
-    <div class="side-panel" data-rpanel="layers">
+    <div class="side-panel" id="panel-layers">
       <h3 class="panel-h">Layers</h3>
       <div class="layers-list" id="layersList"></div>
     </div>
   </aside>
 </main>
 
-<!-- MOBILE BOTTOM NAV -->
-<nav class="mobile-nav">
-  <button class="mn-btn active" data-mnav="templates">📐</button>
-  <button class="mn-btn" data-mnav="elements">✦</button>
-  <button class="mn-btn" data-mnav="text">T</button>
-  <button class="mn-btn" data-mnav="uploads">🖼</button>
-  <button class="mn-btn" data-mnav="props">⚙</button>
-</nav>
-
-<!-- EXPORT MODAL -->
+<!-- MODAL EXPORT -->
 <div class="modal" id="exportModal" hidden>
   <div class="modal-box">
     <h2 class="modal-title">Export Desain</h2>
     <label class="lbl">Format</label>
     <select id="exportFmt">
-      <option value="png">PNG (transparan)</option>
+      <option value="png">PNG</option>
       <option value="jpeg">JPEG</option>
-      <option value="webp">WebP</option>
     </select>
-    <label class="lbl" style="margin-top:14px">Kualitas <span id="qualityVal">95%</span></label>
-    <input type="range" id="exportQuality" min="50" max="100" value="95">
     <div class="modal-actions">
-      <button class="btn-secondary" id="exportCancel">Batal</button>
-      <button class="btn-primary" id="exportGo">⬇ Download</button>
+      <button class="btn-secondary" onclick="closeExport()">Batal</button>
+      <button class="btn-primary" onclick="doExport()">Download</button>
     </div>
   </div>
 </div>
 
-<script src="src/js/editor.js"></script>
+<script src="js/editor.js"></script>
 </body>
 </html>
