@@ -35,7 +35,7 @@ Atau import repo di https://vercel.com/new
 
 ## Struktur
 
-    alca-canva/
+    canva/
     ├── index.html
     ├── vercel.json
     ├── package.json
